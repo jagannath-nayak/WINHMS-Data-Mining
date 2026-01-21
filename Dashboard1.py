@@ -6,7 +6,7 @@ import plotly.express as px
 # Page Configuration
 # -----------------------------
 st.set_page_config(
-    page_title="Sales Executive Performance Dashboard - Rhythm Gurugram",
+    page_title="Sales Executive Performance Dashboard",
     layout="wide"
 )
 
@@ -32,20 +32,34 @@ def format_inr(amount):
         return f"₹{integer}.{parts[1]}"
 
 # -----------------------------
-# Load & Clean Data
+# Clean Uploaded File (ROBUST)
 # -----------------------------
 @st.cache_data
-def load_cleaned_data():
-    file_path = "data/Sales Executive Dec.xls"
+def clean_uploaded_data(uploaded_file):
 
-    df = pd.read_excel(file_path, skiprows=3)
-    df = df.iloc[:, 1:]
+    df = pd.read_excel(uploaded_file, skiprows=3)
 
-    df.columns = [
-        'Sales Person Name', 'Nights', 'Occupancy %', 'Pax',
-        'Room Revenue', 'Revenue%', 'ARR', 'ARP'
-    ]
+    # Remove unnamed first column if exists
+    if df.columns[0].startswith("Unnamed"):
+        df = df.iloc[:, 1:]
 
+    col_count = len(df.columns)
+
+    if col_count == 8:
+        df.columns = [
+            'Sales Person Name', 'Nights', 'Occupancy %', 'Pax',
+            'Room Revenue', 'Revenue%', 'ARR', 'ARP'
+        ]
+    elif col_count == 7:
+        df.columns = [
+            'Sales Person Name', 'Nights', 'Occupancy %', 'Pax',
+            'Room Revenue', 'ARR', 'ARP'
+        ]
+        df['Revenue%'] = 0
+    else:
+        raise ValueError(f"Unsupported file format. Found {col_count} columns.")
+
+    # Remove totals & blanks
     df = df.dropna(subset=['Sales Person Name'])
     df = df[~df['Sales Person Name'].str.contains(
         'Total|Not Defined|Grand Total', case=False, na=False
@@ -54,19 +68,19 @@ def load_cleaned_data():
     numeric_cols = ['Nights', 'Occupancy %', 'Pax', 'Room Revenue', 'Revenue%', 'ARR', 'ARP']
 
     for col in numeric_cols:
-        df[col] = (
-            df[col]
-            .astype(str)
-            .str.replace("₹", "", regex=False)
-            .str.replace(",", "", regex=False)
-            .str.strip()
-        )
-        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+        if col in df.columns:
+            df[col] = (
+                df[col].astype(str)
+                .str.replace("₹", "", regex=False)
+                .str.replace(",", "", regex=False)
+                .str.strip()
+            )
+            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
 
     return df
 
 # -----------------------------
-# KPI Card Styling (FIXED)
+# KPI Card Styling
 # -----------------------------
 st.markdown("""
 <style>
@@ -90,133 +104,141 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # -----------------------------
-# Main App
+# App UI
 # -----------------------------
-try:
-    df = load_cleaned_data()
+st.title("Sales Executive Performance Dashboard")
 
-    # Sidebar
-    st.sidebar.header("Dashboard Controls")
-    selected_names = st.sidebar.multiselect(
-        "Select Sales Persons",
-        options=df['Sales Person Name'].unique(),
-        default=df['Sales Person Name'].unique()
-    )
+uploaded_file = st.file_uploader(
+    "Upload Sales Executive Excel File (.xls or .xlsx)",
+    type=["xls", "xlsx"]
+)
 
-    filtered_df = df[df['Sales Person Name'].isin(selected_names)]
+if uploaded_file:
 
-    # Header
-    st.title("Sales Executive Performance Dashboard - Rhythm Gurugram")
-    st.subheader("Performance Analysis for December 2025")
-    st.divider()
+    try:
+        df = clean_uploaded_data(uploaded_file)
 
-    # KPI Calculations
-    total_revenue = filtered_df['Room Revenue'].sum()
-    total_nights = int(filtered_df['Nights'].sum())
-    avg_arr = filtered_df['ARR'].mean()
-    total_pax = int(filtered_df['Pax'].sum())
-
-    # KPI Cards
-    c1, c2, c3, c4 = st.columns(4)
-
-    with c1:
-        st.markdown(f"""
-        <div class="kpi-box">
-            <div class="kpi-title">Total Room Revenue</div>
-            <div class="kpi-value">{format_inr(total_revenue)}</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with c2:
-        st.markdown(f"""
-        <div class="kpi-box">
-            <div class="kpi-title">Total Nights Sold</div>
-            <div class="kpi-value">{total_nights}</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with c3:
-        st.markdown(f"""
-        <div class="kpi-box">
-            <div class="kpi-title">Average Room Rate (ARR)</div>
-            <div class="kpi-value">{format_inr(avg_arr)}</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with c4:
-        st.markdown(f"""
-        <div class="kpi-box">
-            <div class="kpi-title">Total Pax (Guests)</div>
-            <div class="kpi-value">{total_pax}</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.divider()
-
-    # Charts
-    col_left, col_right = st.columns(2)
-
-    with col_left:
-        st.subheader("Revenue by Sales Person")
-
-        fig_rev = px.bar(
-            filtered_df.sort_values('Room Revenue', ascending=True),
-            x='Room Revenue',
-            y='Sales Person Name',
-            orientation='h',
-            color='Room Revenue',
-            color_continuous_scale='Blues'
+        # Sidebar filter
+        st.sidebar.header("Dashboard Controls")
+        selected_names = st.sidebar.multiselect(
+            "Select Sales Persons",
+            options=df['Sales Person Name'].unique(),
+            default=df['Sales Person Name'].unique()
         )
 
-        fig_rev.update_layout(
-            xaxis=dict(tickprefix="₹ ", tickformat=",.0f"),
-            yaxis={'categoryorder': 'total ascending'}
-        )
+        filtered_df = df[df['Sales Person Name'].isin(selected_names)]
 
-        st.plotly_chart(fig_rev, use_container_width=True)
+        st.subheader("Performance Analysis")
+        st.divider()
 
-    with col_right:
-        st.subheader("Revenue Contribution (%)")
+        # KPI values
+        total_revenue = filtered_df['Room Revenue'].sum()
+        total_nights = int(filtered_df['Nights'].sum())
+        avg_arr = filtered_df['ARR'].mean()
+        total_pax = int(filtered_df['Pax'].sum())
 
-        fig_pie = px.pie(
+        # KPI cards
+        c1, c2, c3, c4 = st.columns(4)
+
+        with c1:
+            st.markdown(f"""
+            <div class="kpi-box">
+                <div class="kpi-title">Total Room Revenue</div>
+                <div class="kpi-value">{format_inr(total_revenue)}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with c2:
+            st.markdown(f"""
+            <div class="kpi-box">
+                <div class="kpi-title">Total Nights Sold</div>
+                <div class="kpi-value">{total_nights}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with c3:
+            st.markdown(f"""
+            <div class="kpi-box">
+                <div class="kpi-title">Average Room Rate (ARR)</div>
+                <div class="kpi-value">{format_inr(avg_arr)}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with c4:
+            st.markdown(f"""
+            <div class="kpi-box">
+                <div class="kpi-title">Total Pax (Guests)</div>
+                <div class="kpi-value">{total_pax}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.divider()
+
+        # Charts
+        col_left, col_right = st.columns(2)
+
+        with col_left:
+            st.subheader("Revenue by Sales Person")
+
+            fig_rev = px.bar(
+                filtered_df.sort_values('Room Revenue', ascending=True),
+                x='Room Revenue',
+                y='Sales Person Name',
+                orientation='h',
+                color='Room Revenue',
+                color_continuous_scale='Blues'
+            )
+
+            fig_rev.update_layout(
+                xaxis=dict(tickprefix="₹ ", tickformat=",.0f"),
+                yaxis={'categoryorder': 'total ascending'}
+            )
+
+            st.plotly_chart(fig_rev, use_container_width=True)
+
+        with col_right:
+            st.subheader("Revenue Contribution (%)")
+
+            fig_pie = px.pie(
+                filtered_df,
+                values='Room Revenue',
+                names='Sales Person Name',
+                hole=0.4
+            )
+
+            fig_pie.update_traces(textinfo='percent+label')
+            st.plotly_chart(fig_pie, use_container_width=True)
+
+        # Scatter plot
+        st.divider()
+        st.subheader("Efficiency Analysis: Nights vs Revenue")
+
+        fig_scatter = px.scatter(
             filtered_df,
-            values='Room Revenue',
-            names='Sales Person Name',
-            hole=0.4
+            x='Nights',
+            y='Room Revenue',
+            size='Room Revenue',
+            color='Sales Person Name'
         )
 
-        fig_pie.update_traces(textinfo='percent+label')
-        st.plotly_chart(fig_pie, use_container_width=True)
+        fig_scatter.update_layout(yaxis=dict(tickprefix="₹ ", tickformat=",.0f"))
+        st.plotly_chart(fig_scatter, use_container_width=True)
 
-    # Scatter
-    st.divider()
-    st.subheader("Efficiency Analysis: Nights vs Revenue")
+        # Data table
+        with st.expander("View Detailed Performance Table"):
+            st.dataframe(
+                filtered_df.style.format({
+                    'Room Revenue': '₹{:,.2f}',
+                    'ARR': '₹{:,.2f}',
+                    'ARP': '₹{:,.2f}',
+                    'Occupancy %': '{:.2f}%',
+                    'Revenue%': '{:.2f}%'
+                }),
+                use_container_width=True
+            )
 
-    fig_scatter = px.scatter(
-        filtered_df,
-        x='Nights',
-        y='Room Revenue',
-        size='Room Revenue',
-        color='Sales Person Name',
-        hover_name='Sales Person Name'
-    )
+    except Exception as e:
+        st.error(f"Error processing file: {e}")
 
-    fig_scatter.update_layout(yaxis=dict(tickprefix="₹ ", tickformat=",.0f"))
-    st.plotly_chart(fig_scatter, use_container_width=True)
-
-    # Data Table
-    with st.expander("View Detailed Performance Table"):
-        st.dataframe(
-            filtered_df.style.format({
-                'Room Revenue': '₹{:,.2f}',
-                'ARR': '₹{:,.2f}',
-                'ARP': '₹{:,.2f}',
-                'Occupancy %': '{:.2f}%',
-                'Revenue%': '{:.2f}%'
-            }),
-            use_container_width=True
-        )
-
-except Exception as e:
-    st.error(f"Error: {e}")
-    st.info("Please make sure the Excel file exists at: data/Sales Executive Dec.xls")
+else:
+    st.info("Please upload a Sales Executive Excel file to generate the dashboard.")
