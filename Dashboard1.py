@@ -2,144 +2,163 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-st.set_page_config(page_title="Sales Dashboard", layout="wide")
+# -----------------------------
+# Page Config
+# -----------------------------
+st.set_page_config(page_title="WINHMS Sales Executive Dashboard", layout="wide")
+
+st.title("🏨 WINHMS Sales Executive Dashboard")
+st.write("Upload Sales Executive Wise Excel report")
+
+uploaded_file = st.file_uploader("Upload Excel file", type=["xls", "xlsx"])
 
 # -----------------------------
-# INR Formatter
-# -----------------------------
-def format_inr(amount):
-    try:
-        return f"₹{float(amount):,.2f}"
-    except:
-        return "₹0.00"
-
-# -----------------------------
-# Detect & Clean File
+# Data Loader
 # -----------------------------
 @st.cache_data
-def load_and_detect(file):
-    df = pd.read_excel(file)
+def load_data(file):
 
-    df.columns = [c.strip().lower() for c in df.columns]
+    df = pd.read_excel(file, skiprows=3)
 
-    has_sales_person = any("sales" in c for c in df.columns)
+    # Drop empty columns
+    df = df.dropna(axis=1, how="all")
 
-    if has_sales_person:
-        mode = "sales"
+    # Drop first unnamed column if exists
+    if "Unnamed: 0" in df.columns:
+        df = df.drop(columns=["Unnamed: 0"])
 
-        rename_map = {}
-        for c in df.columns:
-            if "sales" in c:
-                rename_map[c] = "Sales Person Name"
-            elif "night" in c:
-                rename_map[c] = "Nights"
-            elif "revenue" in c or "amount" in c:
-                rename_map[c] = "Room Revenue"
-            elif "pax" in c or "guest" in c:
-                rename_map[c] = "Pax"
-            elif "arr" in c:
-                rename_map[c] = "ARR"
+    # Validate column count
+    if len(df.columns) < 8:
+        raise ValueError("Invalid WINHMS file. Please upload Sales Executive Wise LNL report.")
 
-        df = df.rename(columns=rename_map)
+    df = df.iloc[:, :8]
+    df.columns = [
+        'Sales Person Name', 'Nights', 'Occupancy %', 'Pax',
+        'Room Revenue', 'Revenue%', 'ARR', 'ARP'
+    ]
 
-    else:
-        mode = "date"
+    # Convert name to string
+    df['Sales Person Name'] = df['Sales Person Name'].astype(str)
 
-        rename_map = {}
-        for c in df.columns:
-            if "date" in c:
-                rename_map[c] = "Date"
-            elif "night" in c:
-                rename_map[c] = "Nights"
-            elif "revenue" in c or "amount" in c:
-                rename_map[c] = "Room Revenue"
-            elif "pax" in c or "guest" in c:
-                rename_map[c] = "Pax"
+    # Remove total rows
+    df = df[~df['Sales Person Name'].str.contains(
+        'total|grand|not defined', case=False, na=False
+    )]
 
-        df = df.rename(columns=rename_map)
+    # Convert numeric columns
+    num_cols = ['Nights', 'Occupancy %', 'Pax', 'Room Revenue', 'Revenue%', 'ARR', 'ARP']
+    for col in num_cols:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
 
-    if "Room Revenue" not in df.columns:
-        raise ValueError("Room Revenue column not found")
+    # Remove NaN rows
+    df = df.dropna(subset=['Sales Person Name', 'Room Revenue'])
 
-    for col in ["Nights", "Room Revenue", "Pax", "ARR"]:
-        if col in df.columns:
-            df[col] = (
-                df[col].astype(str)
-                .str.replace("₹", "")
-                .str.replace(",", "")
-            )
-            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+    # Remove zero revenue rows
+    df = df[df['Room Revenue'] > 0]
 
-    return df, mode
+    # Reset index
+    df = df.reset_index(drop=True)
+
+    return df
+
 
 # -----------------------------
-# UI
+# Dashboard
 # -----------------------------
-st.title("Sales Performance Dashboard")
-
-uploaded_file = st.file_uploader("Upload Excel File", type=["xls", "xlsx"])
-
 if uploaded_file:
+
     try:
-        df, mode = load_and_detect(uploaded_file)
+        df = load_data(uploaded_file)
 
+        # Sidebar Filter
         st.sidebar.header("Filters")
+        people = sorted(df['Sales Person Name'].unique())
 
-        if mode == "sales":
-            filter_col = "Sales Person Name"
-            title_suffix = "Sales Executive Wise"
-        else:
-            filter_col = "Date"
-            title_suffix = "Date Wise"
+        selected = st.sidebar.multiselect("Sales Executive", people, default=people)
+        filtered_df = df[df['Sales Person Name'].isin(selected)]
 
-        selected = st.sidebar.multiselect(
-            f"Select {filter_col}",
-            df[filter_col].astype(str).unique(),
-            default=df[filter_col].astype(str).unique()
-        )
+        # KPIs
+        total_revenue = filtered_df['Room Revenue'].sum()
+        total_nights = int(filtered_df['Nights'].sum())
+        avg_arr = filtered_df['ARR'].mean()
 
-        filtered_df = df[df[filter_col].astype(str).isin(selected)]
-
-        st.subheader(f"Performance Analysis ({title_suffix})")
-        st.divider()
-
-        total_revenue = filtered_df["Room Revenue"].sum()
-        total_nights = int(filtered_df["Nights"].sum()) if "Nights" in filtered_df else 0
-        total_pax = int(filtered_df["Pax"].sum()) if "Pax" in filtered_df else 0
-        avg_arr = total_revenue / total_nights if total_nights > 0 else 0
-
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Total Room Revenue", format_inr(total_revenue))
-        c2.metric("Total Nights Sold", total_nights)
-        c3.metric("Average Room Rate (ARR)", format_inr(avg_arr))
-        c4.metric("Total Pax", total_pax)
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Total Revenue", f"₹ {total_revenue:,.2f}")
+        col2.metric("Total Nights", total_nights)
+        col3.metric("Average ARR", f"₹ {avg_arr:,.2f}")
 
         st.divider()
 
-        fig_bar = px.bar(
+        # -----------------------------
+        # Revenue Contribution Treemap
+        # -----------------------------
+        fig_tree = px.treemap(
             filtered_df,
-            x=filter_col,
-            y="Room Revenue",
-            title=f"Revenue by {filter_col}"
+            path=['Sales Person Name'],
+            values='Room Revenue',
+            title="Revenue Contribution (₹)"
         )
-        fig_bar.update_layout(yaxis_tickprefix="₹ ")
+
+        fig_tree.update_traces(
+            texttemplate="<b>%{label}</b><br>₹%{value:,.0f}<br>%{percentRoot:.1%}",
+            hovertemplate="<b>%{label}</b><br>Revenue: ₹%{value:,.2f}<br>Share: %{percentRoot:.1%}"
+        )
+
+        st.plotly_chart(fig_tree, use_container_width=True)
+
+        # -----------------------------
+        # Revenue Bar Chart
+        # -----------------------------
+        fig_bar = px.bar(
+            filtered_df.sort_values("Room Revenue"),
+            x="Room Revenue",
+            y="Sales Person Name",
+            orientation="h",
+            title="Revenue by Sales Executive (₹)"
+        )
+
+        fig_bar.update_layout(
+            xaxis=dict(tickprefix="₹ ", tickformat=",.0f")
+        )
+
         st.plotly_chart(fig_bar, use_container_width=True)
 
-        if "Nights" in filtered_df.columns:
-            fig_scatter = px.scatter(
-                filtered_df,
-                x="Nights",
-                y="Room Revenue",
-                color=filter_col,
-                title="Nights vs Revenue"
-            )
-            st.plotly_chart(fig_scatter, use_container_width=True)
+        # -----------------------------
+        # Scatter Chart
+        # -----------------------------
+        fig_scatter = px.scatter(
+            filtered_df,
+            x="Nights",
+            y="Room Revenue",
+            size="Room Revenue",
+            color="Sales Person Name",
+            title="Nights vs Revenue (₹)"
+        )
 
-        with st.expander("View Data"):
-            st.dataframe(filtered_df)
+        fig_scatter.update_layout(
+            yaxis=dict(tickprefix="₹ ", tickformat=",.0f")
+        )
+
+        st.plotly_chart(fig_scatter, use_container_width=True)
+
+        # -----------------------------
+        # Data Table (clean)
+        # -----------------------------
+        with st.expander("📄 View Clean Data Table"):
+            st.dataframe(
+                filtered_df.style.format({
+                    'Room Revenue': '₹{:,.2f}',
+                    'ARR': '₹{:,.2f}',
+                    'ARP': '₹{:,.2f}',
+                    'Occupancy %': '{:.2f}%',
+                    'Revenue%': '{:.2f}%'
+                }),
+                use_container_width=True
+            )
 
     except Exception as e:
-        st.error(f"Error processing file: {e}")
+        st.error("❌ Failed to process file")
+        st.exception(e)
 
 else:
-    st.info("Upload your Excel file to view dashboard.")
+    st.info("Please upload a WINHMS Sales Executive Wise LNL Excel file.")
