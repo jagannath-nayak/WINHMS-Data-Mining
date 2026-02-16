@@ -10,4 +10,4 @@ xlrd
 python-dotenv
 google-generativeai
 reportlab
-altair
+altair==4.2.2
