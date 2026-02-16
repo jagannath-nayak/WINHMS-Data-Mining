@@ -10,3 +10,4 @@ xlrd
 python-dotenv
 google-generativeai
 reportlab
+altair
