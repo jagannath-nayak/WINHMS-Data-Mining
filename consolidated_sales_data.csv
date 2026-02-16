@@ -1,0 +1,93 @@
+Sales Executive,Room Nights,Revenue,ARR,Month-Year
+Amartya,185.0,607570.42,3284.16,April 25
+Dinesh Kaushal,95.0,338586.4,3564.07,April 25
+General Manager,795.0,1351196.31,1699.62,April 25
+Jitesh Thakur,56.0,199626.73,3564.76,April 25
+Mukesh Kumar,286.0,991196.46,3465.72,April 25
+Nikhil Dhatrak,25.0,82067.87,3282.71,April 25
+OTA,175.0,692289.45,3955.94,April 25
+Sayed Jilani,98.0,331106.69,3378.64,April 25
+Sonu Choudhary,2.0,11000.0,5500.0,April 25
+Amartya,34.0,86152.27,2533.89,May 25
+Dinesh Kaushal,29.0,104750.66,3612.09,May 25
+General Manager,379.0,720184.15,1900.22,May 25
+Jitesh Thakur,12.0,35967.82,2997.32,May 25
+Mukesh Kumar,226.0,750381.48,3320.27,May 25
+OTA,180.0,610366.35,3390.92,May 25
+Preeti Bisht,5.0,17000.0,3400.0,May 25
+Sayed Jilani,84.0,281491.03,3351.08,May 25
+Sonu Choudhary,7.0,7356.21,1050.89,May 25
+Amartya,34.0,96910.59,2850.31,June 25
+Dinesh Kaushal,104.0,315294.91,3031.68,June 25
+General Manager,159.0,419460.38,2638.12,June 25
+Jayant Joglekar,14.0,45535.61,3252.54,June 25
+Jitesh Thakur,204.0,913818.25,4479.5,June 25
+Mukesh Kumar,206.0,779629.07,3784.61,June 25
+OTA,186.0,624085.65,3355.3,June 25
+Preeti Bisht,13.0,28213.67,2170.28,June 25
+Sayed Jilani,98.0,358349.03,3656.62,June 25
+Sonu Choudhary,0.0,0.0,0.0,June 25
+Amartya,182.0,582700.0,3201.65,July 25
+Dinesh Kaushal,240.0,847126.41,3529.69,July 25
+General Manager,198.0,539374.75,2724.11,July 25
+Jayant Joglekar,25.0,81026.6,3241.06,July 25
+Jitesh Thakur,230.0,697824.99,3034.02,July 25
+Mukesh Kumar,133.0,486755.41,3659.82,July 25
+OTA,228.0,817620.88,3586.06,July 25
+Preeti Bisht,68.0,216349.99,3181.62,July 25
+Sayed Jilani,94.0,204229.96,2172.66,July 25
+Amartya,90.0,280200.0,3113.33,Aug 25
+Dinesh Kaushal,223.0,746871.35,3349.2,Aug 25
+General Manager,1.0,3000.0,3000.0,Aug 25
+Jitesh Thakur,54.0,174714.24,3235.45,Aug 25
+Mukesh Kumar,314.0,896263.75,2854.34,Aug 25
+OTA,101.0,459198.9,4546.52,Aug 25
+Prachi Dhas,2.0,0.0,0.0,Aug 25
+Preeti Bisht,20.0,59750.0,2987.5,Aug 25
+Sayed Jilani,737.0,994217.85,1349.01,Aug 25
+Amartya,33.0,108800.0,3296.97,Sep 25
+Dinesh Kaushal,183.0,645873.53,3529.36,Sep 25
+General Manager,9.0,17999.97,2000.0,Sep 25
+Jitesh Thakur,9.0,29964.28,3329.36,Sep 25
+Mukesh Kumar,505.0,1289556.08,2553.58,Sep 25
+OTA,211.0,1070258.46,5072.31,Sep 25
+Prachi Dhas,0.0,0.0,0.0,Sep 25
+Sayed Jilani,1024.0,1913310.68,1868.47,Sep 25
+Amartya,25.0,106000.0,4240.0,Oct 25
+Dinesh Kaushal,278.0,1015792.63,3653.93,Oct 25
+General Manager,5.0,0.0,0.0,Oct 25
+Jitesh Thakur,74.0,280042.72,3784.36,Oct 25
+Mukesh Kumar,576.0,1491577.03,2589.54,Oct 25
+Nikhil Dhatrak,14.0,55035.71,3931.12,Oct 25
+OTA,159.0,766814.4,4822.73,Oct 25
+Prachi Dhas,0.0,7499.99,0.0,Oct 25
+Sayed Jilani,627.0,1086226.16,1732.42,Oct 25
+Amartya,267.0,1247813.67,4673.46,Nov 25
+Dinesh Kaushal,302.0,1047744.78,3469.35,Nov 25
+General Manager,0.0,0.0,0.0,Nov 25
+Jayant Joglekar,2.0,7000.0,3500.0,Nov 25
+Jitesh Thakur,412.0,2051250.03,4978.76,Nov 25
+Mukesh Kumar,828.0,2518176.43,3041.28,Nov 25
+OTA,194.0,995313.49,5130.48,Nov 25
+Prachi Dhas,0.0,0.0,0.0,Nov 25
+Sayed Jilani,494.0,1059935.7,2145.62,Nov 25
+Sonu Choudhary,4.0,21000.0,5250.0,Nov 25
+Amartya,306.0,868450.0,2838.07,Dec 25
+Dinesh Kaushal,352.0,1220074.72,3466.12,Dec 25
+General Manager,4.0,26238.09,6559.52,Dec 25
+Jayant Joglekar,8.0,28000.0,3500.0,Dec 25
+Jitesh Thakur,109.0,509626.51,4675.47,Dec 25
+Mukesh Kumar,601.0,2065284.34,3436.41,Dec 25
+OTA,274.0,1337110.04,4879.96,Dec 25
+Prachi Dhas,0.0,0.0,0.0,Dec 25
+Sayed Jilani,662.0,1673301.65,2527.65,Dec 25
+Sonu Choudhary,4.0,18690.47,4672.62,Dec 25
+Amartya,433.0,1026676.18,2371.08,Jan 26
+Dinesh Kaushal,292.0,1113916.52,3814.78,Jan 26
+General Manager,3.0,12939.34,4313.11,Jan 26
+Jayant Joglekar,1.0,3500.0,3500.0,Jan 26
+Jitesh Thakur,229.0,1078642.71,4710.23,Jan 26
+Mukesh Kumar,974.0,2714030.95,2786.48,Jan 26
+OTA,183.0,699687.26,3823.43,Jan 26
+Sayed Jilani,187.0,345561.9,1847.92,Jan 26
+Sonu Choudhary,0.0,0.0,0.0,Jan 26
