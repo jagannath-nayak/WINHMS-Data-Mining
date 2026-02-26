@@ -6,88 +6,122 @@ from plotly.subplots import make_subplots
 
 # ─── Page Config ─────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="Rhythm Gurugram | Sales Dashboard",
-    page_icon="📊",
+    page_title="Rhythm Kumarakom | Sales Dashboard",
+    page_icon="🌿",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# ─── Light Sky-Blue Theme CSS ─────────────────────────────────────────────────
+# ─── Light Green Theme CSS ────────────────────────────────────────────────────
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
-    .stApp { background: linear-gradient(135deg, #e8f4fd 0%, #dbeeff 50%, #e0f2fe 100%); }
+    /* Main background — light green gradient */
+    .stApp {
+        background: linear-gradient(135deg, #e8f8ee 0%, #d4f0de 50%, #e0f5e9 100%);
+    }
     .main .block-container { background: transparent; padding-top: 1rem; }
 
+    /* Sidebar */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #ffffff 0%, #f0f8ff 100%);
-        border-right: 2px solid #b3d9f5;
+        background: linear-gradient(180deg, #ffffff 0%, #f0faf4 100%);
+        border-right: 2px solid #a8ddb8;
     }
-    [data-testid="stSidebar"] * { color: #1a3a5c !important; }
+    [data-testid="stSidebar"] * { color: #1a4a2e !important; }
 
+    /* KPI Cards */
     .kpi-card {
-        background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
-        border: 1.5px solid #90c8f0;
+        background: linear-gradient(135deg, #ffffff 0%, #f0faf4 100%);
+        border: 1.5px solid #7ecb96;
         border-radius: 14px;
         padding: 18px 16px;
         text-align: center;
-        box-shadow: 0 4px 16px rgba(59, 130, 180, 0.15);
+        box-shadow: 0 4px 16px rgba(34, 139, 75, 0.13);
         margin-bottom: 4px;
     }
-    .kpi-icon { font-size: 1.6rem; margin-bottom: 4px; }
+    .kpi-icon  { font-size: 1.6rem; margin-bottom: 4px; }
     .kpi-label {
-        color: #4a7fa5; font-size: 0.72rem; font-weight: 600;
-        text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
+        color: #2e7d4f;
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 6px;
     }
-    .kpi-value { color: #0d3b66; font-size: 1.4rem; font-weight: 700; line-height: 1.2; word-break: break-all; }
-    .kpi-sub { font-size: 0.72rem; color: #5b9bd5; margin-top: 4px; }
+    .kpi-value {
+        color: #0d3320;
+        font-size: 1.4rem;
+        font-weight: 700;
+        line-height: 1.2;
+        word-break: break-all;
+    }
+    .kpi-sub { font-size: 0.72rem; color: #4caf72; margin-top: 4px; }
 
+    /* Section Headers */
     .section-header {
-        background: linear-gradient(90deg, #1e6fa8 0%, #3a9bd5 100%);
-        color: #ffffff !important; font-size: 0.95rem; font-weight: 600;
-        padding: 8px 16px; border-radius: 8px; margin: 20px 0 12px 0;
+        background: linear-gradient(90deg, #1b7a40 0%, #2ea858 100%);
+        color: #ffffff !important;
+        font-size: 0.95rem;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 8px;
+        margin: 20px 0 12px 0;
+        letter-spacing: 0.4px;
     }
+
+    /* Leaderboard rows */
     .rank-row {
-        display: flex; align-items: center; padding: 10px 14px;
-        border-radius: 10px; margin-bottom: 6px;
-        background: #ffffff; border: 1.5px solid #b3d9f5;
-        box-shadow: 0 2px 6px rgba(59,130,180,0.08);
+        display: flex;
+        align-items: center;
+        padding: 10px 14px;
+        border-radius: 10px;
+        margin-bottom: 6px;
+        background: #ffffff;
+        border: 1.5px solid #a8ddb8;
+        box-shadow: 0 2px 6px rgba(34,139,75,0.08);
     }
-    .page-title { color: #0d3b66; font-size: 1.7rem; font-weight: 800; margin: 0 0 4px 0; }
-    .page-sub { color: #4a7fa5; font-size: 0.88rem; margin: 0 0 18px 0; }
+
+    .page-title { color: #0d3320; font-size: 1.7rem; font-weight: 800; margin: 0 0 4px 0; }
+    .page-sub   { color: #2e7d4f; font-size: 0.88rem; margin: 0 0 18px 0; }
 
     #MainMenu, footer { visibility: hidden; }
 </style>
 """, unsafe_allow_html=True)
 
 # ─── Constants ────────────────────────────────────────────────────────────────
-PLOT_BG    = "#f8fbff"
-PAPER_BG   = "#f8fbff"
-FONT_COLOR = "#1a3a5c"
-GRID_COLOR = "#d0e8f5"
+PLOT_BG    = "#f4fcf6"
+PAPER_BG   = "#f4fcf6"
+FONT_COLOR = "#1a4a2e"
+GRID_COLOR = "#c8ecd4"
 COLORS = [
-    "#1e6fa8","#e84393","#27ae60","#f39c12",
-    "#8e44ad","#e74c3c","#16a085","#2980b9",
-    "#d35400","#7f8c8d"
+    "#1b7a40","#e84393","#e07b00","#8e44ad",
+    "#2980b9","#e74c3c","#16a085","#d35400",
+    "#7f8c8d","#c0392b","#1abc9c","#f39c12",
+    "#9b59b6","#27ae60"
 ]
 
 def fmt_inr(val):
-    """Full Indian Rupee format with commas. No K/L/Cr shortcuts."""
-    if pd.isna(val):
+    """Full Indian Rupee — no K/L/Cr shortcuts."""
+    if pd.isna(val) or val == 0:
         return "₹0"
     return f"₹{val:,.0f}"
 
 # ─── Data Loading ─────────────────────────────────────────────────────────────
 @st.cache_data
 def load_data():
-    df = pd.read_csv("consolidated_sales_data.csv")
+    df = pd.read_csv("consolidated_kumarakom_sales_data.csv")
     df.columns = df.columns.str.strip()
+    df["Sales Executive"] = df["Sales Executive"].str.strip()
+
+    for col in ["Room Nights", "Revenue", "ARR"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+
     month_order = {
         "April 25": 1, "May 25": 2, "June 25": 3, "July 25": 4,
-        "Aug 25": 5, "Sep 25": 6, "Oct 25": 7, "Nov 25": 8,
-        "Dec 25": 9, "Jan 26": 10
+        "Aug 25": 5,   "Sep 25": 6, "Oct 25": 7,  "Nov 25": 8,
+        "Dec 25": 9,   "Jan 26": 10
     }
     df["Month_Order"] = df["Month-Year"].map(month_order)
     df = df.sort_values("Month_Order").reset_index(drop=True)
@@ -101,12 +135,12 @@ all_execs  = sorted(df["Sales Executive"].unique().tolist())
 with st.sidebar:
     st.markdown("""
     <div style='text-align:center;padding:16px 0 10px 0;'>
-        <div style='font-size:2.4rem;'> </div>
-        <div style='color:#0d3b66;font-size:1.2rem;font-weight:700;'>Rhythm Gurugram</div>
-        <div style='color:#4a7fa5;font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;'>Sales Dashboard</div>
+        <div style='font-size:2.4rem;'>🌿</div>
+        <div style='color:#0d3320;font-size:1.2rem;font-weight:700;'>Rhythm Kumarakom</div>
+        <div style='color:#2e7d4f;font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;'>Sales Dashboard</div>
     </div>
-    <hr style='border-color:#b3d9f5;margin:10px 0;'>
-    <div style='color:#4a7fa5;font-size:0.8rem;font-weight:600;margin-bottom:14px;'>🎛️ FILTERS</div>
+    <hr style='border-color:#a8ddb8;margin:10px 0;'>
+    <div style='color:#2e7d4f;font-size:0.8rem;font-weight:600;margin-bottom:14px;'>🎛️ FILTERS</div>
     """, unsafe_allow_html=True)
 
     sel_month = st.selectbox(
@@ -121,11 +155,11 @@ with st.sidebar:
         index=0
     )
 
-    st.markdown("<hr style='border-color:#b3d9f5;margin:16px 0;'>", unsafe_allow_html=True)
+    st.markdown("<hr style='border-color:#a8ddb8;margin:16px 0;'>", unsafe_allow_html=True)
     st.markdown("""
-    <div style='color:#4a7fa5;font-size:0.72rem;text-align:center;line-height:1.9;'>
+    <div style='color:#2e7d4f;font-size:0.72rem;text-align:center;line-height:1.9;'>
         📊 Data Period<br>
-        <span style='color:#0d3b66;font-weight:700;'>April 2025 – January 2026</span><br><br>
+        <span style='color:#0d3320;font-weight:700;'>April 2025 – January 2026</span><br><br>
     </div>
     """, unsafe_allow_html=True)
 
@@ -137,27 +171,27 @@ if sel_exec != "All Executives":
     mask &= df["Sales Executive"] == sel_exec
 
 filtered   = df[mask].copy()
-sales_reps = filtered[~filtered["Sales Executive"].isin(["General Manager", "OTA"])]
+field_reps = filtered[filtered["Sales Executive"] != "Online"]
 
 # ─── Page Header ──────────────────────────────────────────────────────────────
 st.markdown("""
-<div class='page-title'> Rhythm Gurugram — Sales Productivity Dashboard</div>
-<div class='page-sub'>Comprehensive overview of Room Nights, Revenue & ARR performance across our sales team</div>
+<div class='page-title'>🌿 Rhythm Kumarakom — Sales Productivity Dashboard</div>
+<div class='page-sub'>Comprehensive overview of Room Nights, Revenue & ARR performance across your sales team</div>
 """, unsafe_allow_html=True)
 
 # ─── KPI Cards ────────────────────────────────────────────────────────────────
 total_rn  = int(filtered["Room Nights"].sum())
 total_rev = filtered["Revenue"].sum()
 avg_arr   = filtered[filtered["ARR"] > 0]["ARR"].mean() if (filtered["ARR"] > 0).any() else 0
-top_row   = sales_reps.groupby("Sales Executive")["Revenue"].sum()
+top_row   = field_reps.groupby("Sales Executive")["Revenue"].sum()
 top_exec  = top_row.idxmax() if len(top_row) else "N/A"
-top_rev   = top_row.max() if len(top_row) else 0
+top_rev   = top_row.max()    if len(top_row) else 0
 n_months  = filtered["Month-Year"].nunique()
 
 k1, k2, k3, k4, k5 = st.columns(5)
 for col, icon, label, val, sub in [
     (k1, "🛏️", "TOTAL ROOM NIGHTS", f"{total_rn:,}",   "All selected data"),
-    (k2, "💰", "TOTAL REVENUE",      fmt_inr(total_rev), "Combined executives"),
+    (k2, "💰", "TOTAL REVENUE",      fmt_inr(total_rev), "Combined all channels"),
     (k3, "📈", "AVG. ARR",           fmt_inr(avg_arr),   "Average room rate"),
     (k4, "🏆", "TOP PERFORMER",       top_exec,           fmt_inr(top_rev)),
     (k5, "📅", "MONTHS IN VIEW",      str(n_months),      "Out of 10 total"),
@@ -174,12 +208,12 @@ for col, icon, label, val, sub in [
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# CHART 1 — Monthly Revenue + Room Night Trend (Full Width)
+# CHART 1 — Monthly Revenue + Room Nights Trend  (Full Width)
 # ═══════════════════════════════════════════════════════════════════════════════
 st.markdown("<div class='section-header'>📊 Monthly Total Revenue & Room Night Trend</div>", unsafe_allow_html=True)
 
 monthly = (
-    filtered.groupby(["Month-Year","Month_Order"])
+    filtered.groupby(["Month-Year", "Month_Order"])
     .agg(Revenue=("Revenue","sum"), Room_Nights=("Room Nights","sum"))
     .reset_index().sort_values("Month_Order")
 )
@@ -188,10 +222,10 @@ fig1 = make_subplots(specs=[[{"secondary_y": True}]])
 fig1.add_trace(go.Bar(
     x=monthly["Month-Year"], y=monthly["Revenue"],
     name="Revenue (₹)",
-    marker=dict(color="#1e6fa8", line=dict(color="#0d3b66", width=0.5)),
+    marker=dict(color="#1b7a40", line=dict(color="#0d3320", width=0.5)),
     text=[fmt_inr(v) for v in monthly["Revenue"]],
     textposition="outside",
-    textfont=dict(size=9, color="#0d3b66"),
+    textfont=dict(size=9, color="#0d3320"),
     hovertemplate="<b>%{x}</b><br>Revenue: ₹%{y:,.0f}<extra></extra>",
 ), secondary_y=False)
 
@@ -207,9 +241,9 @@ fig1.add_trace(go.Scatter(
     hovertemplate="<b>%{x}</b><br>Room Nights: %{y}<extra></extra>",
 ), secondary_y=True)
 
-fig1.update_yaxes(title_text="Revenue (₹)", secondary_y=False, gridcolor=GRID_COLOR,
-                  tickfont_size=10, title_font_color="#1e6fa8",
-                  tickformat=",", tickprefix="₹")
+fig1.update_yaxes(title_text="Revenue (₹)", secondary_y=False,
+                  gridcolor=GRID_COLOR, tickfont_size=10,
+                  title_font_color="#1b7a40", tickformat=",", tickprefix="₹")
 fig1.update_yaxes(title_text="Room Nights", secondary_y=True,
                   gridcolor="rgba(0,0,0,0)", title_font_color="#e84393", tickfont_size=10)
 fig1.update_layout(
@@ -222,7 +256,7 @@ fig1.update_layout(
 st.plotly_chart(fig1, use_container_width=True)
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# CHART 2 — Revenue by Executive — Stacked Bar (Full Width)
+# CHART 2 — Executive Revenue Stacked by Month  (Full Width)
 # ═══════════════════════════════════════════════════════════════════════════════
 st.markdown("<div class='section-header'>👥 Executive-wise Revenue by Month (Stacked)</div>", unsafe_allow_html=True)
 
@@ -235,7 +269,7 @@ exec_monthly = (
 fig2 = px.bar(
     exec_monthly, x="Month-Year", y="Revenue",
     color="Sales Executive", barmode="stack",
-    color_discrete_sequence=COLORS, height=460,
+    color_discrete_sequence=COLORS, height=480,
     custom_data=["Sales Executive","Revenue"],
 )
 fig2.update_traces(
@@ -243,7 +277,7 @@ fig2.update_traces(
 )
 fig2.update_layout(
     plot_bgcolor=PLOT_BG, paper_bgcolor=PAPER_BG, font_color=FONT_COLOR,
-    height=460, margin=dict(l=80, r=30, t=20, b=110),
+    height=480, margin=dict(l=80, r=30, t=20, b=120),
     xaxis=dict(gridcolor=GRID_COLOR, tickfont_size=12),
     yaxis=dict(gridcolor=GRID_COLOR, tickfont_size=11, tickformat=",", tickprefix="₹"),
     legend=dict(orientation="h", y=-0.3, font_size=11, title_text=""),
@@ -252,7 +286,7 @@ fig2.update_layout(
 st.plotly_chart(fig2, use_container_width=True)
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# CHART 3 — Room Nights by Executive — Grouped Bar (Full Width)
+# CHART 3 — Room Nights Grouped by Executive per Month  (Full Width)
 # ═══════════════════════════════════════════════════════════════════════════════
 st.markdown("<div class='section-header'>🛏️ Executive-wise Room Nights by Month (Grouped)</div>", unsafe_allow_html=True)
 
@@ -265,7 +299,7 @@ rn_monthly = (
 fig3 = px.bar(
     rn_monthly, x="Month-Year", y="Room_Nights",
     color="Sales Executive", barmode="group",
-    color_discrete_sequence=COLORS, height=430,
+    color_discrete_sequence=COLORS, height=450,
     custom_data=["Sales Executive","Room_Nights"],
 )
 fig3.update_traces(
@@ -273,7 +307,7 @@ fig3.update_traces(
 )
 fig3.update_layout(
     plot_bgcolor=PLOT_BG, paper_bgcolor=PAPER_BG, font_color=FONT_COLOR,
-    height=430, margin=dict(l=60, r=30, t=20, b=110),
+    height=450, margin=dict(l=60, r=30, t=20, b=120),
     xaxis=dict(gridcolor=GRID_COLOR, tickfont_size=12),
     yaxis=dict(gridcolor=GRID_COLOR, tickfont_size=11, title_text="Room Nights"),
     legend=dict(orientation="h", y=-0.3, font_size=11, title_text=""),
@@ -297,16 +331,16 @@ with col4a:
         hole=0.45,
         marker_colors=COLORS[:len(pie_data)],
         textinfo="label+percent",
-        textfont_size=11,
+        textfont_size=10,
         hovertemplate="<b>%{label}</b><br>Revenue: ₹%{value:,.0f}<br>Share: %{percent}<extra></extra>",
         pull=[0.03] * len(pie_data),
     ))
     fig4.update_layout(
         plot_bgcolor=PLOT_BG, paper_bgcolor=PAPER_BG, font_color=FONT_COLOR,
-        height=400, margin=dict(l=10, r=10, t=20, b=10),
-        legend=dict(font_size=11, bgcolor="rgba(255,255,255,0.7)"),
+        height=420, margin=dict(l=10, r=10, t=20, b=10),
+        legend=dict(font_size=10, bgcolor="rgba(255,255,255,0.7)"),
         annotations=[dict(text="Revenue", x=0.5, y=0.5, font_size=13,
-                          showarrow=False, font_color="#0d3b66")]
+                          showarrow=False, font_color="#0d3320")]
     )
     st.plotly_chart(fig4, use_container_width=True)
 
@@ -314,7 +348,9 @@ with col4b:
     st.markdown("<div class='section-header'>🌡️ ARR Heatmap — Executive × Month</div>", unsafe_allow_html=True)
     heat_df = filtered[filtered["ARR"] > 0].copy()
     if not heat_df.empty:
-        pivot = heat_df.pivot_table(index="Sales Executive", columns="Month-Year", values="ARR", aggfunc="mean")
+        pivot = heat_df.pivot_table(
+            index="Sales Executive", columns="Month-Year", values="ARR", aggfunc="mean"
+        )
         ordered_cols = [m for m in all_months if m in pivot.columns]
         pivot = pivot[ordered_cols]
         z_text = [[fmt_inr(v) if not pd.isna(v) else "" for v in row] for row in pivot.values]
@@ -323,9 +359,15 @@ with col4b:
             z=pivot.values,
             x=pivot.columns.tolist(),
             y=pivot.index.tolist(),
-            colorscale="Blues",
+            colorscale=[
+                [0.0,  "#e8f8ee"],
+                [0.25, "#a8ddb8"],
+                [0.5,  "#4caf72"],
+                [0.75, "#1b7a40"],
+                [1.0,  "#0d3320"],
+            ],
             text=z_text, texttemplate="%{text}",
-            textfont=dict(size=9, color="#0d3b66"),
+            textfont=dict(size=8, color="#0d3320"),
             hoverongaps=False,
             hovertemplate="<b>%{y}</b> | %{x}<br>ARR: ₹%{z:,.0f}<extra></extra>",
             colorbar=dict(title="ARR (₹)", tickfont=dict(color=FONT_COLOR, size=9),
@@ -333,7 +375,7 @@ with col4b:
         ))
         fig5.update_layout(
             plot_bgcolor=PLOT_BG, paper_bgcolor=PAPER_BG, font_color=FONT_COLOR,
-            height=400, margin=dict(l=120, r=20, t=20, b=80),
+            height=420, margin=dict(l=140, r=20, t=20, b=80),
             xaxis=dict(tickangle=-30, tickfont_size=10),
             yaxis=dict(tickfont_size=10),
         )
@@ -342,17 +384,19 @@ with col4b:
         st.info("No ARR data available for selected filters.")
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# LEADERBOARD
+# LEADERBOARD  (Field Executives Only — Online excluded)
 # ═══════════════════════════════════════════════════════════════════════════════
 st.markdown("<div class='section-header'>🏆 Sales Leaderboard (Field Executives Only)</div>", unsafe_allow_html=True)
 
 leaderboard = (
-    sales_reps.groupby("Sales Executive")
+    field_reps.groupby("Sales Executive")
     .agg(Revenue=("Revenue","sum"), Room_Nights=("Room Nights","sum"), ARR=("ARR","mean"))
     .sort_values("Revenue", ascending=False).reset_index()
 )
-medals      = ["🥇","🥈","🥉"] + [f"#{i}" for i in range(4, 30)]
-total_lb    = leaderboard["Revenue"].sum()
+leaderboard = leaderboard[leaderboard["Revenue"] > 0]
+
+medals   = ["🥇","🥈","🥉"] + [f"#{i}" for i in range(4, 30)]
+total_lb = leaderboard["Revenue"].sum()
 lb_c1, lb_c2 = st.columns(2)
 
 for idx, (_, row) in enumerate(leaderboard.iterrows()):
@@ -364,19 +408,67 @@ for idx, (_, row) in enumerate(leaderboard.iterrows()):
         <div class='rank-row'>
             <span style='font-size:1.3rem;min-width:40px;display:inline-block;'>{medal}</span>
             <div style='flex:1;padding:0 10px;'>
-                <div style='color:#0d3b66;font-weight:700;font-size:0.92rem;'>{row['Sales Executive']}</div>
-                <div style='color:#4a7fa5;font-size:0.78rem;margin-top:2px;'>
+                <div style='color:#0d3320;font-weight:700;font-size:0.92rem;'>{row['Sales Executive']}</div>
+                <div style='color:#2e7d4f;font-size:0.78rem;margin-top:2px;'>
                     🛏️ {int(row['Room_Nights'])} Room Nights &nbsp;|&nbsp; ARR {fmt_inr(row['ARR'])}
                 </div>
             </div>
             <div style='text-align:right;'>
-                <div style='color:#1e6fa8;font-weight:700;font-size:1rem;'>{fmt_inr(row['Revenue'])}</div>
-                <div style='color:#5b9bd5;font-size:0.75rem;'>{pct:.1f}% of total</div>
+                <div style='color:#1b7a40;font-weight:700;font-size:1rem;'>{fmt_inr(row['Revenue'])}</div>
+                <div style='color:#4caf72;font-size:0.75rem;'>{pct:.1f}% of total</div>
             </div>
         </div>""", unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# INDIVIDUAL DEEP DIVE
+# CHART 6 — Online vs Field Revenue Comparison  (Full Width)
+# ═══════════════════════════════════════════════════════════════════════════════
+st.markdown("<div class='section-header'>🌐 Online vs Field Revenue Comparison by Month</div>", unsafe_allow_html=True)
+
+comp_df = filtered.copy()
+comp_df["Channel"] = comp_df["Sales Executive"].apply(
+    lambda x: "Online" if x == "Online" else "Field Sales"
+)
+channel_monthly = (
+    comp_df.groupby(["Channel","Month-Year","Month_Order"])
+    .agg(Revenue=("Revenue","sum"))
+    .reset_index().sort_values("Month_Order")
+)
+
+fig6 = px.bar(
+    channel_monthly, x="Month-Year", y="Revenue",
+    color="Channel", barmode="group",
+    color_discrete_map={"Online": "#e84393", "Field Sales": "#1b7a40"},
+    height=380,
+    custom_data=["Channel","Revenue"],
+)
+fig6.update_traces(
+    hovertemplate="<b>%{customdata[0]}</b><br>%{x}<br>Revenue: ₹%{customdata[1]:,.0f}<extra></extra>",
+    text=None,
+)
+# Add revenue labels on top of each bar
+for channel, clr in [("Online","#e84393"),("Field Sales","#1b7a40")]:
+    sub = channel_monthly[channel_monthly["Channel"] == channel]
+    fig6.add_trace(go.Scatter(
+        x=sub["Month-Year"], y=sub["Revenue"],
+        mode="text",
+        text=[fmt_inr(v) for v in sub["Revenue"]],
+        textposition="top center",
+        textfont=dict(size=8, color=clr),
+        showlegend=False,
+        hoverinfo="skip",
+    ))
+fig6.update_layout(
+    plot_bgcolor=PLOT_BG, paper_bgcolor=PAPER_BG, font_color=FONT_COLOR,
+    height=400, margin=dict(l=80, r=30, t=30, b=60),
+    xaxis=dict(gridcolor=GRID_COLOR, tickfont_size=12),
+    yaxis=dict(gridcolor=GRID_COLOR, tickfont_size=11, tickformat=",", tickprefix="₹"),
+    legend=dict(orientation="h", y=1.1, x=0.5, xanchor="center", font_size=12),
+    hovermode="x unified", bargap=0.3,
+)
+st.plotly_chart(fig6, use_container_width=True)
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# INDIVIDUAL EXECUTIVE DEEP DIVE
 # ═══════════════════════════════════════════════════════════════════════════════
 st.markdown("<div class='section-header'>🔍 Individual Executive Deep Dive</div>", unsafe_allow_html=True)
 
@@ -387,20 +479,20 @@ exec_pick = st.selectbox(
 )
 exec_df = df[df["Sales Executive"] == exec_pick].sort_values("Month_Order")
 
-# Revenue line
+# Revenue — full width
 fig_d1 = go.Figure()
 fig_d1.add_trace(go.Scatter(
     x=exec_df["Month-Year"], y=exec_df["Revenue"],
     mode="lines+markers+text",
-    line=dict(color="#1e6fa8", width=2.5),
-    marker=dict(size=9, color="#1e6fa8"),
+    line=dict(color="#1b7a40", width=2.5),
+    marker=dict(size=9, color="#1b7a40"),
     text=[fmt_inr(v) for v in exec_df["Revenue"]],
-    textposition="top center", textfont=dict(size=9, color="#0d3b66"),
-    fill="tozeroy", fillcolor="rgba(30,111,168,0.08)",
+    textposition="top center", textfont=dict(size=9, color="#0d3320"),
+    fill="tozeroy", fillcolor="rgba(27,122,64,0.08)",
     hovertemplate="<b>%{x}</b><br>Revenue: ₹%{y:,.0f}<extra></extra>",
 ))
 fig_d1.update_layout(
-    title=dict(text=f"📈 {exec_pick} — Monthly Revenue", font_color="#0d3b66", font_size=13),
+    title=dict(text=f"📈 {exec_pick} — Monthly Revenue", font_color="#0d3320", font_size=13),
     plot_bgcolor=PLOT_BG, paper_bgcolor=PAPER_BG, font_color=FONT_COLOR,
     height=320, margin=dict(l=80, r=20, t=50, b=60),
     xaxis=dict(gridcolor=GRID_COLOR, tickangle=-30, tickfont_size=11),
@@ -408,18 +500,20 @@ fig_d1.update_layout(
 )
 st.plotly_chart(fig_d1, use_container_width=True)
 
+# ARR + Room Nights side by side
 dd1, dd2 = st.columns(2)
+
 with dd1:
     fig_d2 = go.Figure()
     fig_d2.add_trace(go.Bar(
         x=exec_df["Month-Year"], y=exec_df["ARR"],
         marker=dict(color="#f39c12", line=dict(color="#e67e22", width=0.5)),
         text=[fmt_inr(v) for v in exec_df["ARR"]],
-        textposition="outside", textfont=dict(size=9, color="#0d3b66"),
+        textposition="outside", textfont=dict(size=9, color="#0d3320"),
         hovertemplate="<b>%{x}</b><br>ARR: ₹%{y:,.0f}<extra></extra>",
     ))
     fig_d2.update_layout(
-        title=dict(text=f"💛 {exec_pick} — Monthly ARR", font_color="#0d3b66", font_size=13),
+        title=dict(text=f"💛 {exec_pick} — Monthly ARR", font_color="#0d3320", font_size=13),
         plot_bgcolor=PLOT_BG, paper_bgcolor=PAPER_BG, font_color=FONT_COLOR,
         height=320, margin=dict(l=80, r=20, t=50, b=60),
         xaxis=dict(gridcolor=GRID_COLOR, tickangle=-30, tickfont_size=10),
@@ -432,13 +526,13 @@ with dd2:
     fig_d3 = go.Figure()
     fig_d3.add_trace(go.Bar(
         x=exec_df["Month-Year"], y=exec_df["Room Nights"],
-        marker=dict(color="#27ae60", line=dict(color="#1e8449", width=0.5)),
+        marker=dict(color="#1b7a40", line=dict(color="#0d3320", width=0.5)),
         text=exec_df["Room Nights"].astype(int),
-        textposition="outside", textfont=dict(size=10, color="#0d3b66"),
+        textposition="outside", textfont=dict(size=10, color="#0d3320"),
         hovertemplate="<b>%{x}</b><br>Room Nights: %{y}<extra></extra>",
     ))
     fig_d3.update_layout(
-        title=dict(text=f"🛏️ {exec_pick} — Monthly Room Nights", font_color="#0d3b66", font_size=13),
+        title=dict(text=f"🛏️ {exec_pick} — Monthly Room Nights", font_color="#0d3320", font_size=13),
         plot_bgcolor=PLOT_BG, paper_bgcolor=PAPER_BG, font_color=FONT_COLOR,
         height=320, margin=dict(l=50, r=20, t=50, b=60),
         xaxis=dict(gridcolor=GRID_COLOR, tickangle=-30, tickfont_size=10),
@@ -450,15 +544,15 @@ with dd2:
 # ─── Raw Data ─────────────────────────────────────────────────────────────────
 with st.expander("📋 View Full Data Table"):
     disp = filtered.drop(columns=["Month_Order"]).copy()
-    disp["Revenue"]      = disp["Revenue"].apply(fmt_inr)
-    disp["ARR"]          = disp["ARR"].apply(fmt_inr)
-    disp["Room Nights"]  = disp["Room Nights"].astype(int)
+    disp["Revenue"]     = disp["Revenue"].apply(fmt_inr)
+    disp["ARR"]         = disp["ARR"].apply(fmt_inr)
+    disp["Room Nights"] = disp["Room Nights"].astype(int)
     st.dataframe(disp, use_container_width=True, hide_index=True)
 
 # ─── Footer ───────────────────────────────────────────────────────────────────
 st.markdown("""
-<hr style='border:none;border-top:2px solid #b3d9f5;margin-top:28px;'>
-<div style='text-align:center;color:#4a7fa5;font-size:0.76rem;padding:10px 0;'>
-     Rhythm Gurugram &nbsp;|&nbsp; Sales Productivity Dashboard &nbsp;
+<hr style='border:none;border-top:2px solid #a8ddb8;margin-top:28px;'>
+<div style='text-align:center;color:#2e7d4f;font-size:0.76rem;padding:10px 0;'>
+    🌿 Rhythm Kumarakom &nbsp;|&nbsp; Sales Productivity Dashboard &nbsp;
 </div>
 """, unsafe_allow_html=True)
