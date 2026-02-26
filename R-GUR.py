@@ -7,7 +7,7 @@ from plotly.subplots import make_subplots
 # ─── Page Config ─────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Rhythm Gurugram | Sales Dashboard",
-    page_icon="📊",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -101,7 +101,7 @@ all_execs  = sorted(df["Sales Executive"].unique().tolist())
 with st.sidebar:
     st.markdown("""
     <div style='text-align:center;padding:16px 0 10px 0;'>
-        <div style='font-size:2.4rem;'> </div>
+        <div style='font-size:2.4rem;'>🏨</div>
         <div style='color:#0d3b66;font-size:1.2rem;font-weight:700;'>Rhythm Gurugram</div>
         <div style='color:#4a7fa5;font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;'>Sales Dashboard</div>
     </div>
@@ -142,7 +142,7 @@ sales_reps = filtered[~filtered["Sales Executive"].isin(["General Manager", "OTA
 # ─── Page Header ──────────────────────────────────────────────────────────────
 st.markdown("""
 <div class='page-title'> Rhythm Gurugram — Sales Productivity Dashboard</div>
-<div class='page-sub'>Comprehensive overview of Room Nights, Revenue & ARR performance across our sales team</div>
+<div class='page-sub'>Comprehensive overview of Room Nights, Revenue & ARR performance across your sales team</div>
 """, unsafe_allow_html=True)
 
 # ─── KPI Cards ────────────────────────────────────────────────────────────────
@@ -186,8 +186,10 @@ monthly = (
 
 fig1 = make_subplots(specs=[[{"secondary_y": True}]])
 fig1.add_trace(go.Bar(
-    x=monthly["Month-Year"], y=monthly["Revenue"],
+    x=monthly["Month-Year"],
+    y=monthly["Revenue"],
     name="Revenue (₹)",
+    orientation="v",
     marker=dict(color="#1e6fa8", line=dict(color="#0d3b66", width=0.5)),
     text=[fmt_inr(v) for v in monthly["Revenue"]],
     textposition="outside",
@@ -209,7 +211,7 @@ fig1.add_trace(go.Scatter(
 
 fig1.update_yaxes(title_text="Revenue (₹)", secondary_y=False, gridcolor=GRID_COLOR,
                   tickfont_size=10, title_font_color="#1e6fa8",
-                  tickformat=",", tickprefix="₹")
+                  tickformat=",.0f")
 fig1.update_yaxes(title_text="Room Nights", secondary_y=True,
                   gridcolor="rgba(0,0,0,0)", title_font_color="#e84393", tickfont_size=10)
 fig1.update_layout(
@@ -245,7 +247,7 @@ fig2.update_layout(
     plot_bgcolor=PLOT_BG, paper_bgcolor=PAPER_BG, font_color=FONT_COLOR,
     height=460, margin=dict(l=80, r=30, t=20, b=110),
     xaxis=dict(gridcolor=GRID_COLOR, tickfont_size=12),
-    yaxis=dict(gridcolor=GRID_COLOR, tickfont_size=11, tickformat=",", tickprefix="₹"),
+    yaxis=dict(gridcolor=GRID_COLOR, tickfont_size=11, tickformat=",.0f"),
     legend=dict(orientation="h", y=-0.3, font_size=11, title_text=""),
     hovermode="x unified", bargap=0.25,
 )
@@ -315,9 +317,13 @@ with col4b:
     heat_df = filtered[filtered["ARR"] > 0].copy()
     if not heat_df.empty:
         pivot = heat_df.pivot_table(index="Sales Executive", columns="Month-Year", values="ARR", aggfunc="mean")
+        # Robust column ordering — safe for Streamlit Cloud
+        pivot.columns = [str(c) for c in pivot.columns]
         ordered_cols = [m for m in all_months if m in pivot.columns]
-        pivot = pivot[ordered_cols]
-        z_text = [[fmt_inr(v) if not pd.isna(v) else "" for v in row] for row in pivot.values]
+        if ordered_cols:
+            pivot = pivot.reindex(columns=ordered_cols)
+        pivot = pivot.fillna(0)
+        z_text = [[fmt_inr(v) if (not pd.isna(v) and v > 0) else "" for v in row] for row in pivot.values]
 
         fig5 = go.Figure(go.Heatmap(
             z=pivot.values,
@@ -404,7 +410,7 @@ fig_d1.update_layout(
     plot_bgcolor=PLOT_BG, paper_bgcolor=PAPER_BG, font_color=FONT_COLOR,
     height=320, margin=dict(l=80, r=20, t=50, b=60),
     xaxis=dict(gridcolor=GRID_COLOR, tickangle=-30, tickfont_size=11),
-    yaxis=dict(gridcolor=GRID_COLOR, tickfont_size=10, tickformat=",", tickprefix="₹"),
+    yaxis=dict(gridcolor=GRID_COLOR, tickfont_size=10, tickformat=",.0f"),
 )
 st.plotly_chart(fig_d1, use_container_width=True)
 
@@ -412,6 +418,7 @@ dd1, dd2 = st.columns(2)
 with dd1:
     fig_d2 = go.Figure()
     fig_d2.add_trace(go.Bar(
+        orientation="v",
         x=exec_df["Month-Year"], y=exec_df["ARR"],
         marker=dict(color="#f39c12", line=dict(color="#e67e22", width=0.5)),
         text=[fmt_inr(v) for v in exec_df["ARR"]],
@@ -423,7 +430,7 @@ with dd1:
         plot_bgcolor=PLOT_BG, paper_bgcolor=PAPER_BG, font_color=FONT_COLOR,
         height=320, margin=dict(l=80, r=20, t=50, b=60),
         xaxis=dict(gridcolor=GRID_COLOR, tickangle=-30, tickfont_size=10),
-        yaxis=dict(gridcolor=GRID_COLOR, tickfont_size=10, tickformat=",", tickprefix="₹"),
+        yaxis=dict(gridcolor=GRID_COLOR, tickfont_size=10, tickformat=",.0f"),
         bargap=0.35,
     )
     st.plotly_chart(fig_d2, use_container_width=True)
@@ -431,6 +438,7 @@ with dd1:
 with dd2:
     fig_d3 = go.Figure()
     fig_d3.add_trace(go.Bar(
+        orientation="v",
         x=exec_df["Month-Year"], y=exec_df["Room Nights"],
         marker=dict(color="#27ae60", line=dict(color="#1e8449", width=0.5)),
         text=exec_df["Room Nights"].astype(int),
